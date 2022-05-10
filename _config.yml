@@ -1,7 +1,6 @@
 # Site settings
 title:          Houxiaoyang
 description:    " "
-baseurl:        "/tale"
 url:            "https://hxy.email"
 
 # Google Analytics
