@@ -1,8 +1,8 @@
 ---
 layout: post
-title:  "Message Queue"
+title:  " Message Queue "
 date:   2018-01-25 13:18:52 +0800
-categories: 
+categories: message
 ---
 ---
 
