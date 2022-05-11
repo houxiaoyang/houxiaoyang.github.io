@@ -1,16 +1,16 @@
 # Site settings
-title:          cuilongyang
+title:          Houxiaoyang
 description:    " "
-url:            "https://cuilongyang.com"
+url:            "https://hxy.email"
 
 # Google Analytics
 google_analytics: 
 
 # Author
 author:
-  name:         Clyde
-  url:          https://github.com/cuilongyang
-  email:        cuilongyang@gmail.com
+  name:         Belle
+  url:          https://github.com/houxiaoyang
+  email:        xiaoyang.belle@gmail.com
 
 # Build settings
 markdown:       kramdown
