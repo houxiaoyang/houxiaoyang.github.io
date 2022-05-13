@@ -1,0 +1,97 @@
+---
+layout: post
+title:  "递归调用：二维迷宫"
+subtitle: 
+cover-img: 
+thumbnail-img:
+share-img: 
+date: 2021-12-16 16:26:26 +0800
+tags: [Java, 递归, 算法]
+---
+
+#### 递归调用二维迷宫：
+
+思路分析：
+
+- `findway`用来找到迷宫的出口，`Boolean`如果找到就返回`true`，没找到就返回`false` ；
+- `i`，`j`  表示老鼠的位置，初始位置为`（1，1）`；
+- 我们规定 `0`表示可以走的路（但还没走），`1`表示障碍物，`2`表示已经走过的路，`3`表示走了但是不能走；
+- 终点为右下角`(6,5)`，当此位置的数字是`2`的时候，意味着我们找到了出路，返回`true`;
+- 确定优先查找策略，优先级 下=>右=>上=>左。
+
+```java
+class Tools{
+	public boolean findway(int[][] map,int i,int j){
+        if(map[6][5] == 2){
+            return true;//返回true ，就退出
+        }else{
+            if(map[i][j] == 0){//此处表示可以走但是还没有走的路
+            //假定是可以走通的,假定这里是2
+                map[i][j] = 2;
+                //策略为：下=>右=>上=>左，该策略可以修改
+                if(findway(map,i+1,j)){
+                    return true;//下边能否走
+                }else if(findway(map,i,j+1)){
+                    return true;//右边能否走
+                }else if(findway(map,i-1,j)){
+                    return true;//上边能否走
+                }else if(findway(map,i,j-1)){
+                    return true;//左边能否走
+                }else{
+                    map[i][j] == 3；
+                    return false;
+                }     
+            }else{//此处表示，要么是1，3不能走；或者是2
+            //2 的话是前if(map[i][j]==0)的时候去走了，那么我们这里就不走
+                return false;//直接返回false
+            }
+        }
+	}
+}
+public class MiGong{
+	public static void main(String[] args){
+		int[][] map = new int[8][7];
+		for(int i = 0;i < 7;i++){
+			map[0][i] = 1;
+			map[7][i] = 1;
+		}
+        //迷宫的上下边界
+		for(int i = 0;i < 8;i++){
+			map[i][0] = 1;
+			map[i][6] = 1;
+		}
+        //迷宫的左右边界
+		map[3][1] = 1;
+		map[3][2] = 1;
+        //迷宫的内部障碍物
+		System.out.println("=====Map=====");
+		for(int i = 0;i < map.length;i++){
+			for(int j = 0;j < map[i].length;j++){
+				System.out.print(map[i][j]+" ");
+			}
+			System.out.println();
+		}
+        //以上是创建一个迷宫并输出迷宫
+		Tools t1 = new Tools();
+		t1.findway(map,1,1);
+        //传入参数
+		System.out.println("\n=====find====");
+		for(int i = 0;i < map.length;i++){
+			for(int j = 0;j < map[i].length;j++){
+				System.out.print(map[i][j]+" ");
+			}
+			System.out.println();
+		}//找到走出的方案并输出
+	}
+}
+
+```
+
+如果我们**先试着走下方**，走到下方后，发现上下左右都无法再次前进，那么该栈就会退回到上一步，我们**试着走右边**，这种叫做回溯现象。
+
+
+
+
+
+
+

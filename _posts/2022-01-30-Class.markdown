@@ -1,0 +1,170 @@
+---
+layout: post
+title:  " Class类 "
+subtitle: 
+cover-img: 
+thumbnail-img:
+share-img: 
+date: 2022-01-30 22:56:26 +0800
+tags: [Java,Class]
+---
+
+#### Class类：
+
+
+* 1.Class 类继承了Object类
+
+* 2.Class类 不是new出来的，而是系统创建出来的 ClassLoader类加载器 loadClass()创建的
+
+* 3.对于某个类的Class类对象，在内存中只有一份，因为类加载只能加载一次
+
+* 4.每个类的实例都会记得自己由哪个CLass实例所生成的
+
+* 5.通过Class对象可以完整的得到一个类的完整结构（通过一系列API
+
+* 6.CLass对象是存放在堆里的
+
+* 7.类的字节码二进制数据，是放在方法区的，有的地方称为类的元数据据（包括方法代码，方法名，变量名，
+
+  方法名，访问权限等等
+
+
+```java
+Properties properties = new Properties();
+properties.load(new FileInputStream("src\\re.properties"));
+String classfullpath = properties.get("classfullpath").toString();
+String methodName = properties.get("method").toString();
+
+// 1.加载类Class,获取Class类型对象aClass
+Class aClass = Class.forName(classfullpath);
+// 2.通过aClass 得到加载类 com.lon.Cat 的对象实例(得到的实际上已经是Cat类
+Object o = aClass.getDeclaredConstructor().newInstance();
+// 3.通过aClass,得到上述类的MethodName（hi）的方法对象(此处method为方法的对象
+Method method = aClass.getMethod(methodName);
+// 4.可以通过方法的对象，对其传入对象，来调用方法(调用hi方法
+method.invoke(o);
+// 5.Field 代表类的成员变量，Field对象表示某个类的成员变量
+// getField 不能得到私有的属性
+Field nameField = aClass.getField("age");//
+System.out.println(nameField);// 这里只是获得该成员变量，无法获得成员变量的值
+System.out.println(nameField.get(o));//
+// 6.构造器
+// getConstructor() 无参构造器
+Constructor constructor = aClass.getConstructor();
+constructor.getName();
+System.out.println(constructor);
+// 有参构造器，传入的为String类型（形参类型）的Class对象
+Constructor constructor1 = aClass.getConstructor(String.class);
+System.out.println(constructor1);
+```
+
+
+
+```java
+String classAllPath = "com.lon.Car";
+
+// 获取到Car对应的Class类对象
+// <?> 表示不确定的Java类型
+Class<?> aClass = Class.forName(classAllPath);
+
+// 输出 aClass
+System.out.println(aClass);// 显示是哪个类的Class对象
+System.out.println(aClass.getClass());// 输出 aClass 运行类型，java.lang.Class
+
+//得到包名字
+System.out.println(aClass.getPackageName());
+
+// 得到全类名
+System.out.println(aClass.getName());
+
+// 通过aClass创建对象实例
+Car car = (Car) aClass.getConstructor().newInstance();
+System.out.println(car);
+// 通过反射获取属性 brand
+Field brand = aClass.getField("brand");
+System.out.println(brand.get(car));
+
+// 通过反射给属性赋值
+brand.set(car,"BENZ");
+System.out.println(brand.get(car));
+
+Field[] fields = aClass.getFields();
+for (Field field:fields) {
+    System.out.println(field.getName());
+}
+```
+
+
+
+## 获取Class类对象
+
+```java
+// 1.已知一个类的全类名，且该类在类路径下，可通过Calss类的静态方法forName()获取，
+//可能抛出ClassNotFoundException,多应用于配置文件，读取类全路径，加载类
+String classFilePath = "com.lon.Car";// 一般通过配置文件获取
+Class<?> aClass1 = Class.forName(classFilePath);
+System.out.println(aClass1);
+
+// 2.若已知具体的类，通过类class获取，该方式最为安全可靠，程序性能最高实例
+Class aClass2 = Car.class;//多用于参数传递
+System.out.println(aClass2);
+
+//3. 对象.getclass()获取，应用场景，有对象实例
+Car car = new Car();
+Class aClass3 = car.getClass();
+System.out.println(aClass3);
+
+// 4.通过类加载器获得类Class对象
+//   1. 先得到类加载器  得到car的类加载器
+ClassLoader classLoader = car.getClass().getClassLoader();
+//   2.通过类加载器得到Class对象
+Class aClass4 = classLoader.loadClass(classFilePath);
+System.out.println(aClass4);
+```
+
+- 对于基本数据类型：（int,char,boolean,float,double,byte,long,short):
+
+```java
+Class aClass = 基本数据类型.class
+Class<Integer> integerClass = int.class;
+```
+
+- 基本数据类型对应的包装类，可通过.type得到Class类对象
+
+```java
+Class aClass = 包装类.TYPE
+Class<Integer> type = Integer.TYPE;
+```
+
+以上两者的对象其实是一个。
+
+以下类型由Class对象：
+
+1. 外部类：成员内部类，静态内部类，局部内部类，匿名内部类
+2. interface：接口
+3. 数组
+4. enum：枚举
+5. annotation：注释
+6. 基本数据类型
+7. void
+
+```java
+Class<String> stringClass = String.class;// 外部类
+Class<Serializable> serializableClass = Serializable.class;// 接口
+Class<Integer[]> aClass = Integer[].class;// 数组
+Class<float[][]> aClass1 = float[][].class;// 二维数组
+Class<Deprecated> deprecatedClass = Deprecated.class;// 注解
+Class<Thread.State> stateClass = Thread.State.class;//枚举
+Class<Long> longClass = long.class;
+Class<Void> voidClass = void.class;
+Class<Class> classClass = Class.class;
+```
+
+
+
+
+
+
+
+
+

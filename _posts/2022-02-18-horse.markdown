@@ -1,0 +1,158 @@
+---
+layout: post
+title:  " 骑士周游问题 "
+subtitle: 
+cover-img: 
+thumbnail-img:
+share-img: 
+date: 2022-02-18 22:56:26 +0800
+tags: [Java,]
+---
+
+
+
+代码如下：
+
+```java
+package com.lon.horse;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+
+/**
+ * @author cuilongyang
+ * @date 2022/02/18
+ */
+public class horseChessBoard {
+
+    // 定义属性
+    private static int X = 6;  // 表示列 col
+    private static int Y = 6;  // 表示行 row
+
+    // 棋盘
+    private static int[][] chessBoard = new int[Y][X];
+
+    // 定义一个数组 记录某个位置是否通过
+    private static boolean[] visited = new boolean[X * Y];
+
+    // 记录是否已经完全走完   初始化为 否
+    private static boolean finished = false;
+
+    public static void main(String[] args) {
+
+        int row = 2;
+        int col = 2;
+        long start = System.currentTimeMillis();
+        traversalChessBoard(chessBoard,row-1,col-1,1);
+        long end = System.currentTimeMillis();
+        System.out.println("总用时"+(end-start));
+
+
+        // 输出当前棋盘的情况
+        for (int[] rows : chessBoard) {
+            for (int step : rows) { // 该位置是马儿走的第几步
+                System.out.print(step + "\t");
+            }
+            System.out.println();
+        }
+    }
+
+    // 一个代码 实现对 points的排序，使其优先取出下一个少的点，从小到大
+    public static void sort(ArrayList<Point> points){
+        points.sort(new Comparator<Point>() {
+            @Override
+            public int compare(Point o1, Point o2) {
+                return next(o1).size() - next(o2).size();
+            }
+        });
+    }
+
+    // 核心功能  遍历棋盘，如果遍历成功，就将 finished 为 true  将走的每一步记录到棋盘中
+    public static void traversalChessBoard(int[][] chessBoard, int row,int col, int step){
+
+        // 先将 step 记录到 chessBoard中
+        chessBoard[row][col] = step;
+
+        // 把这个位置设置为已经访问
+        visited[row * X +col] = true;
+
+        // 获取当前位置可以走的下一步的位置有那些
+        ArrayList<Point> points = next(new Point(col, row));
+        sort(points);
+        // 遍历
+        while (!points.isEmpty()){
+            // 取出一个位置
+            Point p = points.remove(0);
+
+            // 判断该位置是否走过，如果没有走过就递归遍历
+            if(!visited[p.y * X +p.x]){
+                // 递归遍历
+                traversalChessBoard(chessBoard,p.y,p.x,step+1);
+            }
+        }
+
+        // 当退出 while循环后，判断是否遍历成功，没有成功就重置相应的值，进行回溯
+        if(step < X * Y && !finished){
+            // 重置
+            chessBoard[row][col] = 0;
+            visited[row * X +col] = false;
+        }else {
+            finished = true;
+        }
+    }
+
+    // 编写方法，可以获取当前位置，可以走样的下一步的所有位置
+    public static ArrayList<Point> next(Point curpoint) {
+
+        // 创建一个ArrayList
+        ArrayList<Point> points = new ArrayList<>();
+
+        // 创建一个 Point 对象，准备放入到 ps
+        Point p1 = new Point();
+
+        // 判断在 curPoint 是否可以走如下位置，如果可以走将该点（Point）放入 points
+        // 判断是否可以走5位置
+        if ((p1.x = curpoint.x - 2) >= 0 && (p1.y = curpoint.y - 1) >= 0) {
+            points.add(new Point(p1));// new 放入新位置
+        }
+        // 判断是否可以走6位置
+        if ((p1.x = curpoint.x - 1) >= 0 && (p1.y = curpoint.y - 2) >= 0) {
+            points.add(new Point(p1));// new 放入新位置
+        }
+        // 判断是否可以走7位置
+        if ((p1.x = curpoint.x + 1) < X && (p1.y = curpoint.y - 2) >= 0) {
+            points.add(new Point(p1));// new 放入新位置
+        }
+        // 判断是否可以走0位置
+        if ((p1.x = curpoint.x + 2) < X && (p1.y = curpoint.y - 1) >= 0) {
+            points.add(new Point(p1));// new 放入新位置
+        }
+        // 判断是否可以走1位置
+        if ((p1.x = curpoint.x + 2) < X && (p1.y = curpoint.y + 1) < Y) {
+            points.add(new Point(p1));// new 放入新位置
+        }
+        // 判断是否可以走2位置
+        if ((p1.x = curpoint.x + 1) < X && (p1.y = curpoint.y + 2) < Y) {
+            points.add(new Point(p1));// new 放入新位置
+        }
+        // 判断是否可以走3位置
+        if ((p1.x = curpoint.x - 1) >= 0 && (p1.y = curpoint.y + 2) < Y) {
+            points.add(new Point(p1));// new 放入新位置
+        }
+        // 判断是否可以走4位置
+        if ((p1.x = curpoint.x - 2) >= 0 && (p1.y = curpoint.y + 1) < Y) {
+            points.add(new Point(p1));// new 放入新位置
+        }
+        return points;
+
+    }
+}
+```
+
+
+
+
+
+
+

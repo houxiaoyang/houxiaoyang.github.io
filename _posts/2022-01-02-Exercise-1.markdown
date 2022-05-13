@@ -1,0 +1,162 @@
+---
+layout: post
+title:  " 匿名内部类练习题 "
+subtitle: 
+cover-img: 
+thumbnail-img:
+share-img: 
+date: 2022-01-02 22:57:26 +0800
+tags: [Java, 练习题]
+---
+
+#### 匿名内部类练习题：
+
+```java
+public class exercisefour {
+    public static void main(String[] args) {
+        Cellphone cellphone = new Cellphone();
+//调用testWork方法时，直接传入一个实现了Computer接口的匿名内部类即可
+//该匿名内部类可以灵活的实现work，完成不同的计算任务
+        cellphone.testWork(new Computer() {
+            @Override
+            public double work(double n1, double n2) {
+                return n1 + n2;
+            }
+        }, 10, 15);
+    }
+}
+
+class Cellphone {
+    public void testWork(Computer computer, double n1, double n2) {
+        double result = computer.work(n1, n2);
+        System.out.println("计算后的结果为：" + result);
+    }
+}
+
+interface Computer {
+    double work(double n1, double n2);
+}
+```
+
+以上练习题的匿名内部类是：
+
+```java
+            new Computer() {
+            @Override
+            public double work(double n1, double n2) {
+                return n1 + n2;
+            }
+        }, //10，15 是两个传入的参数
+```
+
+同时也是一个对象，编译类型是Computer
+
+
+
+```java
+public class exerciser {
+    public static void main(String[] args) {
+        new A().f1();
+    }
+}
+
+class A {
+    private final String NAME = "clyde";
+
+    public void f1() {
+        class B {
+            private static final String NAME = "belle";
+
+            public void show() {
+                System.out.println("B name:" + NAME);
+                System.out.println("A name:" + A.this.NAME);
+            }
+        }
+        B b = new B();
+        b.show();
+    }
+}
+```
+
+以上代码应注意：内部类应写在方法里边，同时在外部创建对象调用这个方法，就可以访问内部类
+
+
+
+```java
+package com.cuilo.Annotationc;
+
+/**
+ * @author clyde
+ * @version 1.0
+ */
+public class exerciseSix {
+    public static void main(String[] args) {
+        Person person = new Person("唐僧", new Horse());
+        person.common();
+        person.passRiver();
+
+    }
+}
+
+class Person extends Factory {
+    private String name;
+    private Vehicles vehicles;
+
+    public Person(String name, Vehicles vehicles) {
+        this.name = name;
+        this.vehicles = vehicles;
+    }
+
+    public void passRiver() {
+        if (!(vehicles instanceof Boat)) {
+            vehicles = Factory.getBoat();
+        }
+        vehicles.work();
+    }
+
+    public void common() {
+        //判断当前属性是什么,不存在就获取一匹马
+        if (!(vehicles instanceof Horse)) {
+            vehicles = Factory.getHorse();
+        }
+        vehicles.work();
+    }
+}
+
+class Factory {
+
+    public static Horse getHorse() {
+        return new Horse();
+
+    }
+
+    public static Boat getBoat() {
+        return new Boat();
+    }
+}
+
+class Horse implements Vehicles {
+    @Override
+    public void work() {
+        System.out.println("一般情况，骑马行走");
+    }
+}
+
+class Boat implements Vehicles {
+    @Override
+    public void work() {
+        System.out.println("遇到河流，坐船行走");
+    }
+}
+
+interface Vehicles {
+    void work();
+}
+```
+
+
+
+
+
+
+

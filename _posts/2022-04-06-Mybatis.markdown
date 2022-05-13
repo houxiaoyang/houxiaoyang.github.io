@@ -1,0 +1,343 @@
+---
+layout: post
+title:  " Mybatis "
+subtitle: 
+cover-img: 
+thumbnail-img:
+share-img: 
+date: 2022-04-06 22:10:26 +0800
+tags: [Java, Mybatis]
+---
+
+原始jdbc开发存在的问题如下：
+
+1. 数据库连接创建、释放频繁造成系统资源浪费从而影响系统性能。
+2. sql语句在代码中硬编码，造成代码不易维护，实际应用sql变化的可能较大，sql变动需要改变java代码。
+3. 查询操作时，需要手动将结果集中的数据手动封装到实体中。插入操作时，需要手动将实体的数据设置到sql语句的占位符位置。
+
+应对上述问题给出的解决方案：
+
+1. 使用数据库连接池初始化连接资源   
+2. 将sql语句抽取到xml配置文件中   **解耦合**
+3. **使用反射、内省等底层技术，自动将实体与表进行属性与字段的自动映射**
+
+### MyBatis解决了这个问题!!!
+
+- mybatis是一个优秀的基于java的持久层框架，它内部封装了jdbc，使开发者只需要关注sql语句本身，而不需要花费精力去处理加载驱动、创建连接、创建statement等繁杂的过程。
+- mybatis通过xml或注解的方式将要执行的各种statement配置起来，并通过java对象和statement中sql的动态参数进行映射生成最终执行的sql语句。
+- 最后mybatis框架执行sql并将结果映射为java对象并返回。采用ORM思想解决了实体和数据库映射的问题，对jdbc进行了封装，屏蔽了jdbcAPI底层访问细节，使我们不用与jdbcapi打交道，就可以完成对数据库的持久化操作。
+
+## MyBatis快速入门：
+
+1. 导入MyBatis的坐标和其他相关坐标
+
+   ```xml
+   <dependencies>
+       <dependency>
+       <groupId>mysql</groupId>
+       <artifactId>mysql-connector-java</artifactId>
+       <version>5.1.32</version>
+       </dependency>
+       <dependency>
+       <groupId>org.mybatis</groupId>
+       <artifactId>mybatis</artifactId>
+       <version>3.4.6</version>
+       </dependency>
+       <dependency>
+       <groupId>junit</groupId>
+       <artifactId>junit</artifactId>
+       <version>4.12</version>
+       </dependency>
+       <dependency>
+       <groupId>log4j</groupId>
+       <artifactId>log4j</artifactId>
+       <version>1.2.17</version>
+       </dependency>
+       </dependencies>
+   ```
+
+2. 创建user数据表
+
+3. 编写User实体
+
+   ```java
+   public class User {
+   
+       private int id;
+       private String username;
+       private String password;
+       // getter setter tostring 等方法
+   }
+   ```
+
+4. 编写UserMapper映射文件
+
+   ```xml
+   <?xml version="1.0" encoding="UTF-8" ?>
+   <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                           "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   
+   
+   <!-- 根标签  namespace命名空间-->
+   <mapper namespace="userMapper">
+   
+       <!-- 查询操作 -->
+       <select id="findAll" resultType="com.belle.domain.User">
+           select * from user
+       </select>
+   
+       <!-- 插入操作 -->
+       <insert id="save" parameterType="com.belle.domain.User">
+           insert into user values(#{id},#{username},#{password})
+       </insert>
+   
+   </mapper>
+   ```
+
+5. 编写MyBatis核心文件
+
+   ```xml
+   <?xml version="1.0" encoding="UTF-8" ?>
+   <!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+   <configuration>
+   
+   <!--     数据源的环境 -->
+       <environments default="development">
+           <environment id="development">
+               <transactionManager type="JDBC"></transactionManager>
+               <dataSource type="POOLED">
+                   <property name="driver" value="com.mysql.jdbc.Driver"/>
+                   <property name="url" value="jdbc:mysql://localhost:3306/test"/>
+                   <property name="username" value="root"/>
+                   <property name="password" value="cly"/>
+               </dataSource>
+           </environment>
+       </environments>
+   
+   <!--     加载映射文件 -->
+       <mappers>
+           <mapper resource="com/belle/mapper/UserMapper.xml"></mapper>
+       </mappers>
+   </configuration>
+   ```
+
+6. 编写测试代码  查询操作
+
+   ```java
+   @Test
+   public void test1() throws IOException {
+       //    获得核心配置文件
+       InputStream resourceAsStream = Resources.getResourceAsStream("sqlMapConfig.xml");
+       //    获得Session工厂对象
+       SqlSessionFactory sqlSessionFactory = new
+           SqlSessionFactoryBuilder().build(resourceAsStream);
+       //    获得Session会话对象
+       SqlSession sqlSession = sqlSessionFactory.openSession();
+       //    执行操作  参数为 namespace + 参数id
+       List<User> userList = sqlSession.selectList("userMapper.findAll");
+       //    打印数据
+       System.out.println(userList);
+       //    释放资源
+       sqlSession.close();
+   }
+   ```
+
+   插入操作需要提交事务！！
+
+   ```java
+   @Test
+   public void test2() throws IOException {
+       //模拟user对象
+       User user = new User();
+       user.setUsername("belle");
+       user.setPassword("abc");
+   
+       //    获得核心配置文件
+       InputStream resourceAsStream = Resources.getResourceAsStream("sqlMapConfig.xml");
+       //    获得Session工厂对象
+       SqlSessionFactory sqlSessionFactory = new 
+           SqlSessionFactoryBuilder().build(resourceAsStream);
+       //    获得Session会话对象
+       SqlSession sqlSession = sqlSessionFactory.openSession();
+       //    执行操作  参数为 namespace + 参数id  添加对象
+       sqlSession.insert("userMapper.save",user);
+       //    提交事务
+       sqlSession.commit();
+       //    释放资源
+       sqlSession.close();
+   }
+   ```
+
+
+
+### 增删改查映射配置与API：
+
+查询数据：  `List<User> userList = sqlSession.selectList("userMapper.findAll");`
+
+```xml
+<!-- 查询操作 -->
+<select id="findAll" resultType="com.belle.domain.User">
+    select * from user
+</select>
+```
+
+添加数据：`sqlSession.insert("userMapper.add", user);`
+
+```xml
+<!-- 插入操作 -->
+<insert id="add" parameterType="com.belle.domain.User">
+    insert into user values(#{id},#{username},#{password})
+</insert>
+```
+
+修改数据：`sqlSession.update("userMapper.update", user);`
+
+```xml
+<!-- 修改操作 -->
+<update id="update" parameterType="com.belle.domain.User">
+    update user set username=#{username},password=#{password} where id=#{id}
+</update>
+```
+
+删除数据：`sqlSession.delete("userMapper.delete",3);`
+
+```xml
+<!-- 删除操作 -->
+<delete id="delete" parameterType="java.lang.Integer">
+    delete from user where id=#{id}
+</delete>
+```
+
+MyBatis 的配置文件包含了会深深影响 MyBatis 行为的设置和属性信息。 配置文档的顶层结构如下：
+
+- configuration（配置）
+  - properties（属性）
+  - settings（设置）
+  - typeAliases（类型别名）
+  - typeHandlers（类型处理器）
+  - objectFactory（对象工厂）
+  - plugins（插件）
+  - environments（环境配置）
+    - environment（环境变量）
+      - transactionManager（事务管理器）
+      - dataSource（数据源）
+  - databaseIdProvider（数据库厂商标识）
+  - mappers（映射器）
+
+### 1. environments环境标签：
+
+```xml
+<!--     数据源的环境 -->
+<!--     指定默认的环境名称 -->
+<environments default="development">
+    <!-- 指定当前环境的名称 -->
+    <environment id="development">
+        <!-- 指定事务管理类型为JDBC -->
+        <transactionManager type="JDBC"/>
+        <!-- 指定当前数据源类型时连接池 -->
+        <dataSource type="POOLED">
+            <!-- 数据源配置的基本参数 -->
+            <property name="driver" value="com.mysql.jdbc.Driver"/>
+            <property name="url" value="jdbc:mysql://localhost:3306/test"/>
+            <property name="username" value="root"/>
+            <property name="password" value="cly"/>
+        </dataSource>
+    </environment>
+</environments>
+```
+
+其中，事务管理器（transactionManager）类型有两种：
+
+- JDBC：这个配置就是直接使用了JDBC 的提交和回滚设置，它依赖于从数据源得到的连接来管理事务作用域。
+- MANAGED：这个配置几乎没做什么。它从来不提交或回滚一个连接，而是让容器来管理事务的整个生命周期（比如JEE 应用服务器的上下文）。默认情况下它会关闭连接，然而一些容器并不希望这样，因此需要将closeConnection属性设置为false 来阻止它默认的关闭行为。
+
+
+
+- 其中，数据源（dataSource）类型有三种：
+- UNPOOLED：这个数据源的实现只是每次被请求时打开和关闭连接。
+- POOLED：这种数据源的实现利用“池”的概念将JDBC 连接对象组织起来。
+- JNDI：这个数据源的实现是为了能在如EJB 或应用服务器这类容器中使用，容器可以集中或在外部配置数据源，然后放置一个JNDI 上下文的引用。
+
+
+
+### 2.mapper标签
+
+该标签的作用是加载映射的，加载方式有如下几种：
+
+- 使用相对于类路径的资源引用，例如：
+
+  `<mapper resource="org/mybatis/builder/AuthorMapper.xml"/>`
+
+- 使用完全限定资源定位符（URL），例如：
+
+  `<mapper url="file:///var/mappers/AuthorMapper.xml"/>`
+
+- 使用映射器接口实现类的完全限定类名，例如：
+
+  `<mapper class="org.mybatis.builder.AuthorMapper"/>`
+
+- 将包内的映射器接口实现全部注册为映射器，例如：
+
+  `<package name="org.mybatis.builder"/>`
+
+### 3.Properties标签
+
+实际开发中，习惯将数据源的配置信息单独抽取成一个properties文件，该标签可以加载额外配置的properties文件
+
+```xml
+<properties resource="jdbc.properties"/>
+```
+
+```properties
+jdbc.driver=com.mysql.jdbc.Driver
+jdbc.url=jdbc:mysql://localhost:3306/test
+jdbc.username=root
+jdbc.password=cly
+```
+
+### 4.typeAliases标签
+
+类型别名是为Java 类型设置一个短的名字。原来的类型名称配置如下
+
+```xml
+<typeAliases>
+    <typeAliastype="com.belle.domain.User“ alias="user"></typeAlias>
+</typeAliases>
+```
+
+此处可以设置别名，方便后期使用
+
+```xml
+<select id="findAll" resultType=“user">
+        select * from User
+</select>
+```
+
+## MyBatis的相应API
+
+### SqlSession工厂构建器SqlSessionFactoryBuilder
+
+常用API：SqlSessionFactorybuild(InputStreaminputStream)
+通过加载mybatis的核心文件的输入流的形式构建一个SqlSessionFactory对象
+
+```java
+String resource = "org/mybatis/builder/mybatis-config.xml";
+InputStream inputStream = Resources.getResourceAsStream(resource);
+SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
+SqlSessionFactory factory = builder.build(inputStream);
+```
+
+其中，Resources 工具类，这个类在org.apache.ibatis.io 包中。Resources 类帮助你从类路径下、文件系统或一个web URL 中加载资源文件。
+
+SqlSessionFactory有多个个方法创建SqlSession实例。常用的有如下两个：
+
+- `openSession()`    
+
+   会默认开启一个事务，但事务不会自动提交，也就意味着需要手动提交该事务，更新操作数据才会持久化到数据库中
+
+- `openSession(booleanautoCommit)`
+
+  参数为是否自动提交，如果设置为true，那么不需要手动提交事务
+
+
+

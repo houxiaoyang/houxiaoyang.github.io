@@ -1,0 +1,114 @@
+---
+layout: post
+title:  " Exercise" 
+date: 2022-04-12 20:22:26 +0800
+tags: [Java, Exercise]
+---
+
+单链表面试题：
+
+1. 求单链表中有效节点的个数：
+
+   ```java
+   public static int getLength(HeroNode head){
+       if(head.next==null){
+           return 0;
+       }
+       int length = 0;
+       HeroNode cur = head.next;
+       while (cur!= null){
+           length++;
+           cur = cur.next;
+       }
+       return length;
+   }
+   // 注意不要统计头节点
+   ```
+
+2. 查找单链表中的倒数第k个节点：
+
+   ```java
+   public static HeroNode getIndexNode(HeroNode head, int index){
+       if(head==null){
+           return null;
+       }
+       int size = getLength(head);
+       if(index<=0||index>size){
+           return null;
+       }
+       HeroNode cur = head.next;
+       for (int i = 0; i < size - index; i++) {
+           cur = cur.next;
+       }
+       return cur;
+   }
+   ```
+
+2. 单链表的反转：
+
+   ```java
+   // 单链表反转
+   public static void reverseNode(HeroNode head){
+       if(head.next==null||head.next.next == null){
+           return ;
+       }
+       HeroNode next = null;
+       HeroNode cur = head.next;
+       HeroNode reverseHead = new HeroNode(0,null,null);
+       while (cur!= null){
+           next = cur.next; // 保存当前节点的下一个节点
+           cur.next = reverseHead.next;// cur的下一个节点，指向新链表的最前端
+           reverseHead.next = cur;// 将cur连接到新的链表上
+           cur= next;// 让cur后移
+   
+       }
+       // 将head.next指向反转列表reverseHead.next
+       head.next = reverseHead.next;
+   
+   }
+   ```
+   
+4. 逆序打印单链表：
+
+   利用栈的数据结构，将各个节点压入到栈中，然后利用栈的先进后出的特点，实现逆序打印
+
+   ```java
+   public class StackTest {
+       public static void main(String[] args) {
+           Stack<String> stack = new Stack<>();
+           stack.add("h1");
+           stack.add("h2");
+           stack.add("h3");
+           stack.add("h4");
+           //出栈
+           while (stack.size() > 0) {
+               System.out.println(stack.pop());
+           }
+       }
+   }
+   ```
+
+   代码如下：
+
+   ```java
+   // 逆序打印单链表
+   public static void reversePrint(HeroNode head){
+       if (head.next == null){
+           return;
+       }
+       // 创建一个栈，将各个节点压入栈
+       Stack<HeroNode> stack = new Stack<>();
+       HeroNode cur = head.next;
+       while (cur!=null){
+           stack.push(cur);
+           cur=cur.next;
+       }
+       while (stack.size()>0){
+           System.out.println(stack.pop());
+       }
+   }
+   ```
+
+   
+
+   

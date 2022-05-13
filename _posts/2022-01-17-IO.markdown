@@ -1,0 +1,213 @@
+---
+layout: post
+title:  " IO流 "
+subtitle: 
+cover-img: 
+thumbnail-img:
+share-img: 
+date: 2022-01-17 23:56:26 +0800
+tags: [Java,IO]
+---
+
+# Java IO流：
+
+1. I/O是Input/Output的缩写，I/O技术是非常实用的技术，用于处理数据传输。如读/写文件，网络通信等。
+2. Java程序中，对于数据的输入/输出操作以"流(Stream)"的方式进行。
+3. Java.io包下提供了各种"流"类和接口，用以获取不同种类的数据，并通过方法输入或者输出数据。
+4. 输入input：读取外部数据（磁盘、光盘等存储设备的数据）到程序（内存）中。
+5. 输出output：将程序（内存）数据输出到磁盘、光盘等存储设备中
+
+## IO流的原理及流的分类：
+
+- 按操作数据单位不同分为：字节流（8 bit）（二进制较好）、字符流（按字符）（文本文件）
+
+- 按数据流的流向不同分为：输入流、输出流
+
+- 按流的角色的不同分为：节点流，处理流/包装流
+
+- | 抽象基类 |    字节流    | 字符流 |
+  | :------: | :----------: | :----: |
+  |  输入流  | InputStream  | Reader |
+  |  输出流  | OutputStream | Writer |
+
+1. java 的IO流共涉及40多个类，都是从以上四个**抽象基类**派生
+2. 由这四个类派生出来的子类名称都是以其父类名作为子类名后缀。
+
+## InputStream：字节输入流
+
+InputStream抽象类是所有类字节输入流的超类，该类实现了Closeable接口，进而实现了AutoCloseable接口
+
+### InputStream的常用子类：
+
+#### **FileInputStream** : 文件输入流
+
+#### BufferedInputStream**：缓冲字节输入流。（该子类为**FileInputStream** 类的子类）
+
+#### **ObjectInputStream**：对象字节输入流
+
+单个字节的读取：**read()**效率不高，我们采用**read(byte[] b)**
+
+```java
+public void readFile1() {
+    int readLen = 0;
+    String filePath = "d:\\hello.txt";
+    byte[] buf = new byte[8];
+    FileInputStream fileInputStream = null;
+    try {
+        fileInputStream = new FileInputStream(filePath);
+        // 从该输入流中读取buf.length长度的数据，如果没有输入可用，此方法将会被阻止
+        // 如果返回的值为-1，表示读取完毕
+        // 如果读取正常，返回实际读取的字节数
+        while ((readLen=fileInputStream.read(buf)) != -1) {
+
+            System.out.print(new String(buf,0,readLen));
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+    }finally {
+        //关闭文件 ，释放资源
+        try {
+            fileInputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+#### FileOutputStream:字节输出流
+
+使用FileOutputStream应用在a.txt文件中写入"hello,world"，如果文件不存在就会创建文件，但目录需要存在
+
+```java
+public void writeFile(){
+    FileOutputStream fileOutputStream = null;
+    String filePath = "d:\\a.txt";
+    try {
+        // 以下 当写入内容时，会覆盖原来的内容
+        fileOutputStream = new FileOutputStream(filePath);
+        //以下 当写入内容时，会追加到后边
+        fileOutputStream = new FileOutputStream(filePath,true);
+        // 如果写入一个字符串
+        String str = "hello,world";
+        // str.getBytes() 可以将字符串转换成字节数组
+        fileOutputStream.write(str.getBytes());
+        // str.getBytes(),0,3 可以选择从第0个开始，写3个进去
+        fileOutputStream.write(str.getBytes(),0,3);
+    } catch (IOException e) {
+        e.printStackTrace();
+    }finally {
+        try {
+            fileOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+
+
+### FileReader 和FileWriter介绍：
+
+FileReader 和FileWriter是字符流，即按照字符来操作IO
+
+#### FileReader的相关方法：
+
+1. **new FileReader(File/String)**
+2. read：每次读取**单个字符**，返回该字符，如果到文件末尾，返回-1
+3. read(char[]) ：批量读取多个字符到数组，返回读取到的字符数，如果到末尾返回-1
+
+#### 相关API:
+
+1. **new String(char[])** ：将char[]转换成String
+2. **new String(char[],off,len)**: 将char[] 的指定部分转换成String
+
+#### 案例分析：
+
+使用FileReader从story.txt读取内容：以下为单字节读取，效率不高：
+
+```java
+public void m1() {
+    // 创建流对象
+    FileReader fileReader = null;
+    int data = 0;
+    try {
+        fileReader = new FileReader("d:\\story.txt");
+        while ((data= fileReader.read())!=-1){
+            System.out.print((char) data);
+        }
+
+    } catch (IOException e) {
+        e.printStackTrace();
+    }finally {
+        if(fileReader!= null){
+            try {
+                fileReader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+```
+
+改进为字符串读取：
+
+```java
+public void m2(){
+    // 创建流对象
+    FileReader fileReader = null;
+    int readLen = 0;
+    char[] buf = new char[8];
+    try {
+        fileReader = new FileReader("d:\\story.txt");
+        // 循环读取，返回读取到的字符数
+        while ((readLen= fileReader.read(buf))!=-1)
+            System.out.print(new String(buf,0,readLen));
+    } catch (IOException e) {
+        e.printStackTrace();
+    }finally {
+        if(fileReader!= null){
+            try {
+                fileReader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+```
+
+#### FileWriter常用方法：
+
+1. new FileWriter(File/String)：覆盖模式，相当于流的指针在前端
+2. new FileWriter(File/String,true)：追加模式，相当于流的指针在尾端
+3. write(int)：写入单个字符
+4. write(char[])：写入指定数组
+5. write(char[],off,len)：写入指定数组的指定部分
+6. write(string)：写入整个字符串
+7. write(string,off,len)：写入字符串的自定部分
+
+#### 相关API：
+
+String类：**toCharArray：**将String转换成char[]
+
+#### 注意：
+
+**FileWriter使用后，必须要关闭(close)或者刷新（flush)，否则写入不到指定的文件！**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

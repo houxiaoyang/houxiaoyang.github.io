@@ -1,0 +1,144 @@
+---
+layout: post
+title:  " maven "
+subtitle: 
+cover-img: 
+thumbnail-img:
+share-img: 
+date: 2022-03-10 22:56:26 +0800
+tags: [Javaweb,maven]
+---
+
+## 基本概念
+
+- 静态Web:
+  - html  css
+  - 提供给所有人看的数据始终不会发生变化
+- 动态Web
+  - 提供给所有人看的数据始终会发生变化，每个人在
+  - 技术栈：Servlet/JSP  ASP PHP
+
+**在Java中，动态Web资源开发的技术统称为Javaweb**
+
+
+
+面试题：请你谈谈网站是如何进行访问的
+
+1. 输入一个域名：回车
+2. 查询本机hosts配置是否有该域名的映射；没有的话进行下一步
+3. 去DNS服务器去查找到就进行
+
+### 发布一个web网站：
+
+- 将自己写的网站，放到服务器tomcat中指定的web应用的文件夹（webapps) 下就可以访问了
+
+- 网站的结构
+
+  ```java
+  -- webapps: // tomcat服务器的web目录
+  	-ROOT
+      -belle  // 网站的目录名
+          -classes  // java程序
+          -lib  // web应用所依赖的jar包
+          -web.xml    // w
+      - index.html   // 默认的首页
+      - static
+          -css
+          	-style.css
+          -js
+          -img
+          ...
+  ```
+  
+
+
+
+### Maven资源导出
+
+```xml
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                    <include>**/*.xml</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                    <include>**/*.xml</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+```
+
+
+
+### pom.xml文件配置：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--Maven版本和头文件-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!--  这是是刚才配置的GAV-->
+  <groupId>com.belle</groupId>
+  <artifactId>javaweb-01-maven</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <!-- 项目的打包方式-->
+  <packaging>war</packaging>
+
+  <!-- 配置-->
+  <properties>
+    <!--    项目的默认构建编码-->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!--    编码版本-->
+    <maven.compiler.source>1.7</maven.compiler.source>
+    <maven.compiler.target>1.7</maven.compiler.target>
+  </properties>
+
+  <!--  项目依赖-->
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>**/*.properties</include>
+          <include>**/*.xml</include>
+        </includes>
+        <filtering>true</filtering>
+      </resource>
+      <resource>
+        <directory>src/main/java</directory>
+        <includes>
+          <include>**/*.properties</include>
+          <include>**/*.xml</include>
+        </includes>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+  </build>
+</project>
+```
+
+
+

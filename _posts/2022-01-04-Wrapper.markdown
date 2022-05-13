@@ -1,0 +1,120 @@
+---
+layout: post
+title:  " 包装类 "
+subtitle: 
+cover-img: 
+thumbnail-img:
+share-img: 
+date: 2022-01-04 14:05:26 +0800
+tags: [Java, 包装类]
+---
+
+#### 包装类：
+
+基本数据类型：下方六个均为`Number`的子类
+
+| 基本数据类型 |  包装类   |
+| :----------: | :-------: |
+|   boolean    |  Boolean  |
+|     char     | Character |
+|    `byte`    |  `Byte`   |
+|   `short`    |  `Short`  |
+|    `int`     | `Integer` |
+|    `long`    |  `Long`   |
+|   `float`    |  `Float`  |
+|   `double`   | `Double`  |
+
+
+
+#### 包装类和基本数据类型的转换：
+
+JDK5之前的手动装箱和拆箱方式：装箱：基本数据类  ====>  包装类型，反之，称为拆箱
+
+JDK5之后的自动装箱和拆箱方式：
+
+自动装箱底层调用的时`valueOf`方法，
+
+```java
+public class Integerc {
+    public static void main(String[] args) {
+        int n2 = 100;
+        Integer integer2 = n2;//底层使用的时new Integer.valueof(n2)
+        int n3 = integer2;
+    }
+}
+```
+
+以下输出的结果是什么？**三元运算符一个整体提高精度，会提升精度为double，所以输出为1.0**
+
+```java
+        Object obj1 = true ? new Integer(1) : new Double(2.0);
+        System.out.println(obj1);
+```
+
+以下输出什么？**if-else 不会改变两者的精度，输出为1**
+
+```java
+        Object obj2;
+        if(true){
+            obj2 = new Integer(1);
+        }else {
+            obj2 = new Double(2.0);
+        }
+        System.out.println(obj2);
+```
+
+
+
+#### 包装类方法：
+
+**Integer   ===>  String:**
+
+方法1： `Integer i = 100; String str = i + "";`
+
+方法2：`Integer i = 100; String str =i.toString();`
+
+方式3； `Integer i = 100; String str = String。valueOf(i);`
+
+**String    ===>   Integer:**
+
+方法1：`String str = "12345"; Integer i = Integer.parseInt(str);` //使用到自动装箱
+
+方法2：`String str = "12345"; Integer i = new Integer(str);`
+
+**Integer源码如下：** `IntegerCache.low =-128；IntegerCache.high = 127`
+
+```java
+    @IntrinsicCandidate
+    public static Integer valueOf(int i) {
+        if (i >= IntegerCache.low && i <= IntegerCache.high)
+            return IntegerCache.cache[i + (-IntegerCache.low)];
+        return new Integer(i);
+    }
+```
+
+所以我们知道：
+
+```java
+        Integer m = 1;
+        Integer n = 1;
+        System.out.println(m == n);//true
+```
+
+```java
+        Integer m = 128;
+        Integer n = 128;
+        System.out.println(m == n);//false
+```
+
+只要有基本数据类型，`==` 判断的就是值是否相同
+
+```java
+        Integer m = 128;
+        int n = 128;
+        System.out.println(m == n);//true
+```
+
+
+
+
+

@@ -1,0 +1,118 @@
+---
+layout: post
+title:  " String "
+subtitle: 
+cover-img: 
+thumbnail-img:
+share-img: 
+date: 2022-01-05 13:05:26 +0800
+tags: [Java, String]
+---
+
+#### String类：实现了两个接口interface：
+
+**1.`Serializable` 串行化,接口对象可以在网络中传输    2.`Comparable`  说明String对象可以比较**
+
+- String对象用于保存字符串，也就是一组字符序列
+
+- 字符串常量对象时用双引号括起的字符序列，举例`"你好"`，`"12.97"`，`"boy"`
+
+- 字符串的字符使用Unicode字符编码，一个字符（不区分字母还是汉字）占两个字节
+
+- String 类是final类，是不能被其他类继承的，
+
+- String类有属性，`private final char value[] ;` 用于存放字符串内容
+
+- **注意：value是一个final类型，赋值后不可修改（指的是`value[]` 的地址是不可以修改的，value[]的地址无法指向新的地址，但是单个字符内容是可以变化的）**
+
+- String类有很多个构造器，实现了构造器的重载
+
+- String 类常用的构造方法：
+
+  ```java
+          String s1 = new String();
+          String s2 = new String(String original);
+          String s3 = new String(char[] a);
+          String s4 = new String(byte[] b);
+          String s5 = new String(char[] a ,int startIndex,int count);
+  ```
+
+  
+
+#### 创建String对象的两种方式：
+
+1. **直接赋值：`String s = "belle";`**
+
+   先从常量池查看是否有"belle"数据空间，如果有，直接指向；如果没有则重新创建，然后指向，s最终指向的是常量池的地址。
+
+2. **调用构造器`String s = new String("belle");`**
+
+   先在堆中创建空间，里面维护了value属性，指向常量池的belle的空间。如果常量池中没有"belle"，重新创建，如果有，直接通过value指向。最终指向的是堆中的空间地址。
+
+下列程序中一共创建了几个对象？三个！
+
+```java
+        String a = "belle";
+        String b = "hello";
+        String c = a + b;
+```
+
+第三步中，首先 创建一个`StringBuilder sb = StringBuilder();`    执行`sb.append("belle")`    `sb.append("hello");`     `String c = sb.toString();`   最终结果是`c指向堆中的(String) value[]` 指向池中的`"bellehello"`
+
+**总结：如果是两个常量相加，就是在常量池中，如果是两个变量相加，指向的是堆中。**
+
+#### ※※※练习题：
+
+```java
+public class Exercise {
+    public static void main(String[] args) {
+        Test ex = new Test();
+// 创建一个新对象，指向堆的一个空间，包含一个value(其指向池中的"belle"),和
+// 一个chr[](包含四个值java)
+        ex.change(ex.str, ex.ch);
+        System.out.print(ex.str + "and");
+        System.out.println(ex.ch);
+    }
+}
+```
+
+````java
+public class Test {
+    String str = new String("belle");
+    final char[] ch = {'j', 'a', 'v', 'a'};
+
+    public void change(String str, char ch[]) {
+        str = "java";
+        ch[0] = 'l';
+    }
+}
+````
+
+ `ex.change(ex.str, ex.ch);`  将两个值传入方法中，在栈里有`change`方法，str原本指向value ，change方法使其改为指向池中的java，`ch[]`还是指向原来的空间java，我们将其改为`lava.`
+
+`System.out.print(ex.str + "and");` 调用的还是`ex.str` 这里的没有变化还是指向的value,value指向的是"belle",所以该语句输出为：`belleand`
+
+`System.out.println(ex.ch);`  :调用`ex.ch` 由于已经改变为lava，所以总的输出为  `belleandlava`  
+
+#### 占位符：`%s` ,`%d`,`%.2f`，`%c`
+
+`%s` 表示后边由字符串类替换      `%d` 表示后边是整数  
+
+  `%.2f`  表示使用小数来替换，保留两位    `%c` 使用char类型来替换
+
+举例如下：  顺序不能改变，不能是整数写为字符串
+
+```java
+public class StringExercise {
+    public static void main(String[] args) {
+        String name = "belle";
+        int age = 26;
+        double score = 99.0;
+        char gender = '女';
+        String formatStr = "我的姓名是%s,年龄%d，成绩是%.2f，性别是%c";
+        String info = String.format(formatStr,name,age,score,gender);
+        System.out.println(info);
+    }
+}
+```
+

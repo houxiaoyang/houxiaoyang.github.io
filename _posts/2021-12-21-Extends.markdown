@@ -1,0 +1,162 @@
+---
+layout: post
+title:  " 继承（Extends） "
+subtitle: 
+cover-img: 
+thumbnail-img:
+share-img: 
+date: 2021-12-21 15:20:26 +0800
+tags: [Java, 继承]
+---
+
+#### 继承（Extends）：
+
+继承：代码复用性，当多个类存在相同的属性是，从这个属性中抽象出父类（基类、超类），在父类中定义这些相同的方法和属性，所有的子类（派生类）不需要重新定义这些属性和方法，只需要通过Extends来声明继承父类即可。
+
+继承的基本语法：
+
+```Java
+class 子类 extends 父类{
+    
+}
+```
+
+继承的好处：代码的复用性提高了，扩展性提高了
+
+- 子类继承了所有的属性和方法，但是**私有属性和方法不能在子类直接访问**，需要通过公共的方法去访问
+- 子类必须调用父类的构造器，完成父类的初始化
+- 当创建子类对象时，**不管使用哪个构造器，默认情况下总会去调用父类的无参构造器**，如果父类没有提供无参构造器，则必须在子类的构造器中用super去指定使用父类的哪个构造器完成对父类的初始化工作，否则会导致编译不通过。
+- 如果希望指定调用父类的吗，某个构造器，则必须显时`super(形参)`
+- **`super()`使用时必须放在构造器的第一行**。必须放在子类构造器的前边，先执行父类构造器。
+- **`super()` 和 `this()` 都只能放在构造器的第一行，所以这两个不能共存在一个构造器。**
+- java的所有类都是Object类的子类，Object是所有类的父类（基类）。
+- 父类构造器的调用不限于直接父类，将一直向上追溯到Object类（顶级父类）。
+- 子类的最多只能继承一个父类（直接继承），Java是单继承机制。
+- 不能滥用继承，子类和父类必须满足 `is-a` 的关系
+
+#### 继承的本质分析：
+
+当子类对象创建好后，建立查找关系。
+
+```java
+package com.cuilo.extend_;
+//继承的本质
+public class ExtendsTheory {
+    public static void main(String[] args) {
+        Son son = new Son();
+        System.out.println(son.name);//大头儿子
+        System.out.println(son.age);//39
+        System.out.println(son.hobby);//39
+        //首先看子类是否有这个属性且可访问，如果子类没有，就看父类有没有且可访问
+        //直到Object，如果都没有就报错
+
+    }
+}
+class Grandpa {//爷爷类
+    String name = "大头爷爷";
+    String hobby = "旅游";
+}
+class Father extends Grandpa {//父类
+    String name = "大头爸爸";
+    int age = 39;
+}
+class Son extends Father {  //子类
+    String name = "大头儿子";
+}
+```
+
+**如果父类有一个private类age，但是爷爷类有一个public的age会调用吗？**
+
+**不会的，如果从下往上找，已经找到了age但是不能调用，就报错了，不会再向上查找了**
+
+父类构造器如下：
+
+```java
+class Computer {
+    private String cpu;
+    private String ram;
+    private String disk;
+
+    public Computer() {
+    }
+
+    public Computer(String cpu, String ram, String disk) {
+        this.cpu = cpu;
+        this.ram = ram;
+        this.disk = disk;
+    }
+
+    public String getCpu() {
+        return cpu;
+    }
+
+    public void setCpu(String cpu) {
+        this.cpu = cpu;
+    }
+
+    public String getRam() {
+        return ram;
+    }
+
+    public void setRam(String ram) {
+        this.ram = ram;
+    }
+
+    public String getDisk() {
+        return disk;
+    }
+
+    public void setDisk(String disk) {
+        this.disk = disk;
+    }
+
+    public String getDetail() {
+        return "CPU为：" + cpu + " 内存为：" + ram + " 硬盘为：" + disk;
+    }
+}
+```
+
+
+
+子类构造器如下：
+
+ ```java
+ class PC extends Computer {
+     private String brand;
+    //父类构造器完成子类对象的初始化，子类的构造器完成子类的初始化
+     public PC(String cpu, String ram, String disk, String brand) {
+         super(cpu, ram, disk);
+         this.brand = brand;
+     }
+ 
+     public String getBrand() {
+         return brand;
+     }
+ 
+     public void setBrand(String brand) {
+         this.brand = brand;
+     }
+     public void getInfo(){
+         System.out.println("PC信息：");
+         //调用父类的getDetail的方法获取信息
+         System.out.println(getDetail()+" 品牌为："+brand);
+     }
+ }
+ ```
+
+#### super关键字：代表父类的引用，用于访问父类的属性、方法、构造器
+
+1.可以访问父类的属性但是无法访问父类的私有属性。`super.属性名`
+
+2.可以访问父类的方法，不能访问父类的私有方法。`super.方法名(参数列表)；`
+
+#### super使用细节：
+
+- 分工明确，
+
+- 当子类中有父类中的成员重名是，必须通过super调用，先看本类有没有，没有继续看父类，以及是否可用
+
+  （找到了不能访问，直接报错，一直找不打，提示方法不存在）。`cal()`  `this.cal()`  `super.cal` 
+
+  **注意：`super.cal()` 直接查找父类的方法，不会看本类是否有（是否可以）**  即跳过本类；
+

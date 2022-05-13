@@ -1,0 +1,234 @@
+---
+layout: post
+title:  " 抽象类（abstract）、接口 "
+subtitle: 
+cover-img: 
+thumbnail-img:
+share-img: 
+date: 2021-12-29 23:05:26 +0800
+tags: [Java, 抽象类, 接口]
+---
+
+#### 抽象类 abstract：
+
+父类的方法不确定性：当父类的某些方法需要声明，但是又不确定如何实现时，可以将其声明为抽象方法，那么这个类就是抽象类。
+
+```java
+abstract class A{
+    public abstract void eat();
+}
+```
+
+这里的父类A中的eat方法不确定，我们用 abstract 来修饰这个方法（导致我们也必须用 abstract 来修饰整个父类），用 abstract 来修饰的类就是抽象类。**抽象方法没有方法体`{}`**
+
+父类的抽象方法可以用子类来实现，设计好后让子类来继承它。
+
+#### 抽象类细节分析：
+
+1. 抽象类无法被实例化。
+2. 抽象类不一定有抽象方法，
+
+```java
+abstract class A{
+    无抽象方法
+}
+```
+
+3 . 抽象类可以有任意成员（本质还是类，类有什么它也有什么）
+
+4.如果一个类继承了抽象类，那么它必须实现抽象类的所有抽象方法，除非他自己也声明为抽象类。
+
+**5.抽象方法不能使用private、final和static来修饰，因为这些关键字都与重写相违背。**
+
+#### 模板设计模式：
+
+```java
+abstract public class Template {
+    public abstract void job();
+    public void cal() {//实现的方法
+        long start = System.currentTimeMillis();
+        job();
+        long end = System.currentTimeMillis();
+        System.out.println("执行时间=" + (end - start));
+    }
+}
+```
+
+首先我们先创建一个模板`Template`，创建一个抽象的方法`job()`，把子类中都相同的方法`cal()`放在父类中，该方法调用抽象的`job()`方法，但是`job()`方法没有初始化。创建子类时，继承该父类`cal()`，则我们必须重写父类的抽象方法`job()`，恰好我们需要这个`job()`方法不一样，就可以重写该方法。
+
+```java
+public class TestEx extends Template {
+    public void job() {
+        int num = 0;
+        for (long i = 0; i <= 10000000; i++) {
+            num += i;
+        }
+    }
+}
+```
+
+运行时我们直接创建该子类`TestEx`对象，对象直接调用`cal()`方法，由于子类没有，前往父类`Template`调用该方法：`job()`动态绑定机制会前往创建对象子类调用方法
+
+```java
+public class ExTest {
+    public static void main(String[] args) {
+        TestEx testEx = new TestEx();
+        testEx.cal();
+    }
+}
+```
+
+
+
+#### 接口：
+
+首先创建一个接口格式Interface ：
+
+```java
+public interface UsbInterface {
+    //规定了相关的规范
+    void start();
+    void end();
+}
+```
+
+创建一个相机类，把接口的方法实现： `implements ` 实施
+
+```java
+public class Camera implements UsbInterface{
+    //让相机接入这个接口：把接口的方法时实现它
+    @Override
+    public void start() {
+        System.out.println("相机开始工作");
+    }
+
+    @Override
+    public void end() {
+        System.out.println("相机关闭工作");
+    }
+}
+```
+
+在通过接口来调用这个方法：
+
+```java
+public class Computer {
+    public void work(UsbInterface usbInterface){
+        //通过接口调用这个方法
+        usbInterface.start();
+        usbInterface.end();
+    }
+}
+```
+
+运行即可实现接口的调用：
+
+```java
+public class Test {
+    public static void main(String[] args) {
+        Camera camera = new Camera();
+        Computer computer = new Computer();
+        computer.work(camera);
+    }
+}
+```
+
+##### 接口就是给出一些没有实现的方法，封装到一起，在某个类需要使用的时候在根据具体情况把这些方法写出来：
+
+````java
+interface 接口名{
+    //属性
+    //方法  1.抽象方法  2.默认实现方法  3.静态方法
+}
+````
+
+```java
+class 类名 implements 接口{
+    自己属性;
+    自己方法;
+    //必须实现接口的抽象方法
+}
+```
+
+**注意**：jdk7之前接口里所有方法都没有方法体，即都是抽象方法。**在接口中可以省略abstract关键字**
+
+jdk8后可以有默认实现方法，但是需要`default`关键字修饰，可以有静态方法
+
+```java
+public interface UsbInterface {
+    default public void hi(){
+        System.out.println("hi");
+    }
+    public static void hello(){
+        System.out.println("hello");
+    }
+}
+```
+
+#### 接口注意事项和细节分析：
+
+1. 接口不能被实例化
+
+2. 在接口中可以省略abstract关键字。public关键字
+
+3. 一个普通类实现接口，就必须将该接口的所有方法都实现，可以通过`alt+enter`来实现
+
+4. **抽象类实现接口，可以不用实现接口的方法**
+
+5. 一个类同时可以实现多个接口。`class hi implements IB,IC{}`
+
+6. 接口中的属性，只能是final的，而且是`public static final int a = 23;` 
+
+7. 接口中属性访问方式是：接口名.属性名
+
+8. 一个接口不能继承其他类，但是可以继承多个别的接口
+
+   ```java
+   interface A extends B,C{}
+   ```
+
+9. **接口的修饰符只能是public和默认，**此处和类的修饰符是一样的。
+
+#### 实现接口和继承类区别辨析：实现接口是对单继承机制的一种补充。
+
+只能继承一个但是可以有很多方法，（爸爸只有一个师父可以很多个）
+
+接口比继承更加灵活。继承需要满足`is a` ，接口只需要满足`like a`
+
+**接口在一定程度上实现代码的解耦。**(接口实现机制+动态绑定机制)
+
+#### 接口的多态特性：
+
+1. 多态参数:接口类型的变量 `IF monster` 可以指向实现了`IF` 接口的对象实例 `monster = new Car();`
+
+```java
+public class Test {
+    public static void main(String[] args) {
+        IF monster = new Monster();
+        monster = new Car();
+
+    }
+}
+interface IF{}
+class Monster implements IF{}
+class Car implements IF{}
+
+```
+
+2. 多态数组
+
+3. 多态传递：**B接口继承了A接口，那么B接口的实现也可以指向A接口**
+
+   ```java
+   public class Test {
+       public static void main(String[] args) {
+           B myPhone = new MyPhone();
+           A phone = new MyPhone();
+       }
+   }
+   interface A{}
+   interface B extends A{}
+   class MyPhone implements B {}
+   ```
+
+   

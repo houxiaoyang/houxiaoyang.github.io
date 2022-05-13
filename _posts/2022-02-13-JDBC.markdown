@@ -1,0 +1,198 @@
+---
+layout: post
+title:  " JDBC和数据库连接池 "
+subtitle: 
+cover-img: 
+thumbnail-img:
+share-img: 
+date: 2022-02-13 22:56:26 +0800
+tags: [Java, JDBC]
+---
+
+
+
+
+
+1. JDBC为访问不同的数据库提供了统一的接口，为使用者屏蔽了细节问题
+2. Java程序员使用JDBC，可以连接任何提供了JDBC驱动程序的数据库系统，从而完成对数据库的各种操作
+
+```java
+Driver driver = new Driver();// 创建driver对象
+
+// jdbc:mysql:// 规定好协议，
+// localhost:3306  主机和端口，主机地址可以为IP地址
+// lon_db02 连接到mysql的dbms的哪个数据库
+// mysql 的连接本质就是socket连接
+String url = "jdbc:mysql://localhost:3306/lon_db02";
+
+// 将用户名密码放入Properties对象
+Properties properties = new Properties();
+properties.setProperty("user","root");
+properties.setProperty("password","cly");
+
+// 获取连接 connect
+Connection connect = driver.connect(url, properties);
+
+// 执行sql 语句
+String sql =  "insert into actor values(null,'刘德华','男','1970-11-11','110')";
+
+// statement 用户执行静态 sql 语句并返回其生成的结果的对象
+Statement statement = connect.createStatement();
+
+// 返回结果得到rows,如果为 1 则表示添加成功，为 0 则表示添加失败
+int rows = statement.executeUpdate(sql);
+System.out.println(rows > 0 ? "成功":"失败");
+
+// 关闭连接
+statement.close();
+connect.close();
+```
+
+## 连接数据库的五种方式：
+
+第二种方式，采取反射机制：
+
+- ```java
+          Class<?> aClass = Class.forName("com.mysql.jdbc.Driver");
+          Driver driver = (Driver) aClass.getDeclaredConstructor().newInstance();
+  ```
+
+推荐如下方式进行：
+
+```java
+        Class<?> aClass = Class.forName("com.mysql.jdbc.Driver");
+        Driver driver = (Driver) aClass.getDeclaredConstructor().newInstance();
+
+        String url = "jdbc:mysql://localhost:3306/lon_db02";
+        String user = "root";
+        String password = "cly";
+
+        Connection connection = DriverManager.getConnection(url, user, password);
+```
+
+注意事项：
+
+1. mysql驱动在5.1.6可以无序CLass.forname()来驱动
+2. jdk1.5之后，不在需要显示调用class.forname()来注册驱动，而是自动调用驱动jar包下的meta-inf/services/java.sql.Driver文本中的类名称去注册
+
+## ResultSet
+
+```java
+
+        // 通过Properties 对象获取配置文件的信息
+        Properties properties = new Properties();
+        properties.load(new FileInputStream("src\\user.properties"));
+
+        // 获取相关值
+        String user = properties.getProperty("user");
+        String password = properties.getProperty("password");
+        String url = properties.getProperty("url");
+        String driver = properties.getProperty("driver");
+
+        // 1.注册驱动
+        Class.forName(driver);
+
+        // 2.得到连接
+        Connection connection = DriverManager.getConnection(url, user, password);
+
+        // 3.得到statement
+        Statement statement = connection.createStatement();
+
+        // 4.组织sql语句
+        String sql = "select id, name, sex, borndate from actor";
+        ResultSet resultSet = statement.executeQuery(sql);
+
+        // 5.使用循环while取出
+        while (resultSet.next()) { // 让光标向后移动，如果没有更多行，则会返回false
+            int id = resultSet.getInt(1);// 获取该行的第一个数据
+            String name = resultSet.getString(2);
+            String sex = resultSet.getString(3);
+            Date date = resultSet.getDate(4);
+            System.out.println(id + "\t" + name + "\t" + sex + "\t" + date + "\t");
+        }
+
+        // 6.关闭连接
+        resultSet.close();
+        statement.close();
+        connection.close();
+    }
+```
+
+
+
+## Statement
+
+1. Statement对象 用于执行静态sql语句并返回其生成结果的对象
+
+2. 在连接建立后，需要对数据库进行访问，执行 命名或是sql语句，可以通过：
+
+   - Statement
+   - **PreparedStatement** [预处理]
+   - CallableStatement
+
+3. Statement对象执行sql语句，存在**sql注入**风险
+
+   **sql注入**是利用某些系统没有对用户输入的数据进行充分的检查，而在用户输入数据中注入非法的sql语句或命令，恶意攻击数据库
+
+4. 要防范sql注入，只要用PreparedStatement（从Statement扩展而来）取代Statement即可。
+
+
+
+## PrepareStatement
+
+1. PrepareStatement执行sql语句中的参数用  ？来表示，调用PrepareStatement对象的  setXxx()  方法来设置这些参数，第一个参数是要设置的sql语句中的参数的索引（从1开始），第二个是设置sql语句中的参数的值
+2. 调用 executeQuery()  ，返回  ResultSet  对象
+3. 调用  executeUpdate()  : 执行更新，包括增、删、改   返回int类型  表示收到影响的函数 多少行 0 表示失败
+
+
+
+## 事务
+
+1. JDBC程序中当一个Connection对象创建时，默认情况下是自动提交事务：每次执行一个sql语句时，如果执行成功，就会向数据库自动提交，而不能回滚
+2. JDBC程序中为了让多个sql语句作为一个整体执行，需要使用事务
+3. **调用Connection的setAutoCommit(false) 可以取消自动提交事务**
+4. 在所有的sql语句都成功执行后，调用commit() 方法提交事务
+5. 在其中的某个操作失败或者出现异常时，调用rollback()  方法回滚事务
+
+举例如下：
+
+```java
+public void useTransaction() {
+    //操作转账的业务
+    //1. 得到连接
+        
+    Connection connection = null;
+    
+    //2. 组织一个sql
+    String sql = "update account set balance = balance - 100 where id = 1";
+    String sql2 = "update account set balance = balance + 100 where id = 2";
+    PreparedStatement preparedStatement = null;
+    
+    //3. 创建PreparedStatement 对象
+    try {
+        connection = JDBCUtils.getConnection(); // 在默认情况下，connection 是默认自动提交
+        //将connection 设置为不自动提交
+        connection.setAutoCommit(false); //开启了事务
+        preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.executeUpdate(); // 执行第 1 条sql
+        //int i = 1 / 0; //抛出异常
+        preparedStatement = connection.prepareStatement(sql2);
+        preparedStatement.executeUpdate(); // 执行第 2 条sql
+        //这里提交事务
+        connection.commit();
+    } catch (SQLException e) {
+        //这里我们可以进行回滚，即撤销执行的SQL
+        //默认回滚到事务开始的状态.
+        System.out.println("执行发生了异常，撤销执行的sql");
+        try {
+            connection.rollback();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        e.printStackTrace();
+    } finally {
+        //关闭资源
+        JDBCUtils.close(null, preparedStatement, connection);
+    }
+```
+

@@ -1,0 +1,129 @@
+---
+layout: post
+title:  " 单例模式、final关键字 "
+subtitle: 
+cover-img: 
+thumbnail-img:
+share-img: 
+date: 2021-12-29 14:37:26 +0800
+tags: [Java, 单例模式, final]    
+---
+
+#### 单例模式：
+
+单例模式，所谓的单例设计模式就是采取一定的方法保证再整个的软件系统中，只能存在一个对象实例，并且该类只提供一个取得其对象实例的方法。
+
+单例模式有两种方式：
+
+##### 饿汉模式 ：只要类加载就已经创建了
+
+1.将构造器私有化
+
+```java
+    private GirlFriend(String name) {
+        this.name = name;
+    }
+```
+
+2.在类的内部直接创建对象。该对象为static  （这里即为还未创建对象，类机制就已经加载对象了）
+
+```java
+    private static GirlFriend gf = new GirlFriend("belle");
+```
+
+3.提供一个公共的static方法返回gf对象
+
+```java
+    public static GirlFriend getInstance(){
+        return gf;
+    }
+```
+
+##### 懒汉式：解决了：饿汉式容易造成创建了对象，但是我们没有使用，造成资源浪费。
+
+1.仍然将构造器私有化：
+
+```java
+    private Cat(String name) {
+        this.name = name;
+    }
+```
+
+
+
+2.定义一个static静态属性对象：
+
+```java
+    private static Cat cat;
+```
+
+
+
+3.提供一个public的static方法，可以返回一个cat对象（判断如果为空就创建这个对象）：
+
+```java
+    public static Cat getInstance(){
+        if(cat == null){
+            cat = new Cat("小白");
+//这里存在线程安全问题时，多个线程同时进入，后续解决
+        }
+        return cat;
+    }
+```
+
+懒汉式，只有用户使用这个方法才会创建，再次调用时，不为空，则返回上次的对象。
+
+#### final关键字：
+
+final可以修饰类、属性、方法和局部变量
+
+在某些需要情况会遇到final:
+
+1. 当不希望类被继承时，可以使用final修饰
+2. 当不希望父类的某个子方法被子类覆盖/重写时，可以使用final关键字
+3. 当不希望类的某个属性的值被修改，可以用final修饰
+4. 当不希望某个局部变量被修改，可以使用final修饰
+
+```java
+public final void hi(){}
+```
+
+##### 注意事项和细节：
+
+1. final修饰的属性又叫做常量一般用XX_XX_XX来命名；
+
+2. final修饰的属性在定义时必须赋初值，并且以后不能在修改，赋值可以在如下位置之一（选其一即可）：
+
+   1.在定义时：如`public final double TAX_RATE = 0.08;` 直接赋值
+
+   2.在构造器中
+
+   3.在代码块中
+
+3. 如果final修饰的属性时**静态**的，则初始化的位置只能是在 **定义时**或者 **在静态代码块中**     `不能在构造器中赋值`
+
+4. final类不能继承，但是可以实例化对象 `final class DD(){}`
+
+5. 如果类不是final类，但是含有final方法，则该方法虽然不能重写但是可以被继承。意思就是可以调用父类的final方法但是不能重写他。
+
+6. 如果一个类已经是final类，就不需再去修饰final方法了。
+
+7. final不能修饰构造器
+
+8. final和static往往搭配使用，效率更高，不会导致类加载，底层编译器做了优化：
+
+   ```java
+   class B{
+       public final static int num = 10086;
+       static {
+           System.out.println("B的静态代码块被调用");
+       }
+   }//这里调用num时，不会去调用B的静态代码块
+   ```
+
+   **如果我们不希望静态代码块被调用，仅仅需要调用num， 那么我们用final修饰静态属性，就不会执行静态代码块的内容。**
+
+9. 包装类（Integer，Double，Float,Boolean都属于final），String也是final类，不能被继承。
+
+
+

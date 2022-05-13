@@ -1,0 +1,306 @@
+---
+layout: post
+title:  " Math、Arrays、Date"
+subtitle: 
+cover-img: 
+thumbnail-img:
+share-img: 
+date: 2022-01-06 15:05:26 +0800
+tags: [Java, Arrays, Date]
+---
+
+#### Math类：
+
+Math类包含用于执行基本数字运算的方法，如初等指数、对数、平方根和三角函数。
+
+// abs 绝对值`Math.abs(-5);`
+// pow 求幂`Math.pow(2,4);`
+// ceil 向上取整，返回 >= 该参数的最小整数`Math.ceil(3.00001);`
+// floor 向下取整，返回 <= 该参数的最大整数`Math.floor(4.9999);//5.0`
+//round 四舍五入  `Math.round(5.001);`
+// sqrt 求开方`Math.sqrt(-9.0);`
+
+##### **//random 随机数[0~1)随机整数**
+
+练习题：求一个a<= x<= b的随机数：
+
+```java
+(int)(a) <= x <= (int)(a + Math.random() * (b-a + 1)+ a);
+```
+
+ `Math.random() * (b-a)`  返回一个大于0小于`b-a` 的值
+
+举例为 `2<= x <= 7`:  `Math.random() * (6)`   结果为大于0小于6的数，再加上2
+
+结果为`2 <= x < 8` 的数，我们取整，2可以取到，8无法取到，取整的话只能取到7，所以结论成立
+
+`Math.min(1,15);`返回最小值为1
+
+`Math.max(2,9);`返回最大值为9
+
+#### Arrays类：
+
+Arrays包含了一系列**静态方法**，用于管理或操作数组（比如排序和搜索等）
+
+1. `toString` 返回数组的字符串形式  `Arrays.toString(arr)`  遍历数组
+
+2. `sort` 排序（自然排序和定制排序）
+
+   练习题：
+
+   ```java
+   public class MathTest {
+       public static void main(String[] args) {
+           Book[] books = new Book[4];
+           books[0] = new Book("红楼梦",100);
+           books[1] = new Book("新金瓶梅",90);
+           books[2] = new Book("青年文摘二十年",5);
+           books[3] = new Book("Java",300);
+           Arrays.sort(books, new Comparator() {
+               @Override
+               public int compare(Object o1, Object o2) {
+                   Book book1 = (Book) o1;
+                   Book book2 = (Book) o2;
+                   int priceVal = book1.getPrice()- book2.getPrice();
+                   if (priceVal > 0){
+                       return -1;
+                   }else if (priceVal < 0){
+                       return 1;
+                   }else{
+                       return 0;
+                   }
+               }
+           });
+           System.out.println(Arrays.toString(books));
+           Arrays.sort(books, new Comparator() {
+               @Override
+               public int compare(Object o1, Object o2) {
+                   Book book1 = (Book) o1;
+                   Book book2 = (Book) o2;
+                   return book1.getName().length()-book2.getName().length();
+               }
+           });
+           System.out.println(Arrays.toString(books));
+       };
+   }
+   class Book{
+       private String name;
+       private int price;
+   
+       public Book(String name, int price) {
+           this.name = name;
+           this.price = price;
+       }
+   
+       public int getPrice() {
+           return price;
+       }
+   
+       public String getName() {
+           return name;
+       }
+   
+       @Override
+       public String toString() {
+           return " Book name= " + name +
+                   " price= " + price;
+       }
+   }
+   ```
+
+   
+
+3. 使用binarySearch二叉查找法: **该数组应该是有序的**，
+
+ ```java
+   Integer[] arr = {1,3,5,7,8,9,11};
+   int index = Arrays.binarySearch(arr,6);
+   System.out.println("index=" + index);
+ ```
+
+注意：举例上述6不存在，他如果存在的位置是在5后边，`index`应该为3，这个`low` 即为3，
+
+返回值为  `return -(low + 1);`  即为-4.
+
+4. `copyOf`  数组元素的复制：
+
+   从arr数组中拷贝一个arr.length个元素到newArr数组中
+
+   如果需要拷贝长度大于`arr.length`，就在新数组后加上null
+
+   如果长度arr.length小于0 直接抛出异常`NegativeArraySizeException` 负数组异常
+
+   该方法的底层使用的是`System.arraycopy()`
+
+   ```java
+           Integer[] arr = {1,2,4,5,67,88,234};
+           Integer[] newArr = Arrays.copyOf(arr,arr.length);
+           System.out.println(Arrays.toString(newArr));
+   ```
+
+5. fill 数组元素的填充：
+
+   ```java
+           Integer[] num = new Integer[]{9,3,2};
+           // 使用66 去替换原来的所有数
+           Arrays.fill(num,66);
+           System.out.println(Arrays.toString(num));
+   ```
+
+6. equals比较两个数组元素是否完全一致：
+
+   ```java
+           boolean equals = Arrays.equals(num,num2);
+   ```
+
+7. asList将一组值，转换成list
+
+   ```java
+           List aslist = Arrays.asList(num);
+           System.out.println("asList=" + aslist);
+   ```
+
+   
+
+#### System类：
+
+1. `exit` 退出当前程序  `System.exit(0);`程序退出状态，0表示正常状态
+
+2. `arraycopy`：复制数组元素，比较适合底层调用，`Arrays.copyOf`完成复制数组
+
+   `src` : 源数组   `srcPos` : 从原数组那个索引位置开始拷贝
+
+   `dest:` 目标数组，把原数组的数据拷贝到那个数组
+
+   `destPos:` 把原数组的数据拷贝到 目标数组的那个索引
+
+   `length:` 从原数组拷贝多少个数据到目标数组  :sun_with_face:    拷贝的少了 用0 补齐，多了报错
+
+   ```java
+   int[] src = {1,2,3};
+   int[] dest = new int[3];
+   System.arraycopy(src,0,dest,0,3);//123
+   ```
+
+3. `currentTineMillens` : 返回当前时间距离1970-1-1的毫秒数
+4. gc:运行垃圾回收机制；`System.gc();`
+
+#### `BigInteger`和 `BigDecimal`
+
+当我们编程中需要很大的数，long 不够用，采用BigInteger
+
+```java
+        BigInteger bigInteger = new BigInteger("12542666666958635");
+        System.out.println(bigInteger);
+```
+
+加减乘除会有专门的方法：不能用 `+  -  *  /`  创建一个要操作的BigInteger
+
+```java
+        BigInteger bigInteger1 = new BigInteger("100");
+        BigInteger add = bigInteger.add(bigInteger1);
+        System.out.println(add);
+```
+
+减  `subtract`   乘  `multiply`   除  `divide`
+
+需要精确的很高的小数：采用`BigDecimal` :
+
+```java
+        BigDecimal bigDecimal = new BigDecimal("1.56468871468546546546");
+        System.out.println(bigDecimal);
+```
+
+减  `subtract`   乘  `multiply`   除  `divide`  除法**可能会**存在无限循环，解决：在调用`divide`时指定一个精度
+
+```java
+        BigDecimal bigDecimal1 = new BigDecimal("2");
+        System.out.println(bigDecimal.divide(bigDecimal1,BigDecimal.ROUND_CEILING));
+```
+
+#### Date:
+
+第一代日期Date：
+
+```java
+        Date date = new Date();
+        System.out.println("当前时间为：" + date);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日 hh:mm:ss E");
+        String format = sdf.format(date);
+        System.out.println(format);
+```
+
+第二代日期类Calendar:
+
+Calendar: 抽象类，构造器时私有化的，可以采用`getInstance()` 获取：
+
+```java
+        Calendar calendar = Calendar.getInstance();
+        System.out.println(calendar);
+        System.out.println(calendar.get(Calendar.YEAR));// 年
+        System.out.println(calendar.get(Calendar.MONTH)+1);// 月
+        System.out.println(calendar.get(Calendar.DAY_OF_MONTH));// 日
+        System.out.println(calendar.get(Calendar.HOUR_OF_DAY));// 24h
+```
+
+第三代日期类：
+
+**Calendar存在问题：可变性，偏移性（年份从1900开始，月份从0开始），格式化（只对Date有用，Calendar无用），也不是线程安全，不能处理闰秒。**
+
+`localDate` (年月日)  `localTime`(时分秒)  `localDateTime`(日期时间/年月日时分秒)
+
+```java
+        LocalDate now = LocalDate.now();
+        System.out.println(now);
+```
+
+获得当前时间：`LocalDateTime.now()`  
+
+获得当前年：月：日：时：分：秒：  `LocalTime`
+
+```java
+        LocalDateTime now = LocalDateTime.now();
+        System.out.println(now);
+        System.out.println(now.getYear());
+        System.out.println(now.getMonth());
+        System.out.println(now.getDayOfMonth());
+        System.out.println(now.getHour());
+        System.out.println(now.getMinute());
+        System.out.println(now.getSecond());
+```
+
+ 使用`DateTimeFormatter`:
+
+```java
+DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日 hh:mm:ss");
+String format = dateTimeFormatter.format(now);
+System.out.println(format);
+```
+
+使用静态方法`now()`获取当前时间戳:
+
+```java
+Instant now = Instant.now();
+System.out.println(now);
+```
+
+通过`from` 可以把`Instant`转成`Date`
+
+`Date date = Date.from(now);`
+
+**通过date的`toInstant()` 可以把date转成Instant对象:**
+
+`Instant instant = date.toInstant();` 
+
+**提供`plus` 和`minus` 方法可以对当前时间进行加或者减**
+
+```java
+        LocalDateTime localDateTime = now.plusDays(365);// 加365天
+        System.out.println(dateTimeFormatter.format(localDateTime));
+```
+
+```java
+        LocalDateTime localDateTime = now.minusMinutes(600);// 600分钟前
+        System.out.println(dateTimeFormatter.format(localDateTime));
+```
+

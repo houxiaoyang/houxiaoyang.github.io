@@ -1,0 +1,145 @@
+---
+layout: post
+title:  "方法重载、可变参数、作用域"
+subtitle: 
+cover-img: 
+thumbnail-img:
+share-img: 
+date: 2021-12-17 15:01:00 +0800
+tags: [Java, 可变参数, 作用域]
+---
+
+#### 方法重载（Overload）：
+
+Java中允许**同一个类，多个同名方法的存在，但要求形参列表不一致。**
+
+`System.out.println();`  `out`是`Print Stream`的类型。
+
+优点：减轻了起名的麻烦，减轻了记名的麻烦。
+
+```java
+public class findMax{
+	public static void main(String[] args){
+		Tools test = new Tools();
+		int n = test.max(10,15);
+		System.out.println(n);
+	}
+}
+class Tools{
+	public int max(int n1,int n2){
+    //以下运用了三元运算符
+		return n1 > n2 ? n1:n2;
+	}
+    public double max(double n,double n2){
+        return n1 > n2 ? n1:n2;
+    }
+    public double max(double n1,double n2,double n3){
+        double max1 = n1 > n2 ? n1:n2;
+        return max1 > n3 ? max1:n3;
+    }
+}
+```
+
+
+
+#### 可变参数：
+
+Java允许将同一个类中**多个同名**`同功能`单**参数个数不同的方法**，封装成一个方法，这里就可以通过可变参数实现。
+
+```java
+class Tools{
+    public int sum(int n1,int n2){
+        return n1 + n2;
+	}
+	public int sum(int n1,int n2,int n3){
+        return n1 + n2 + n3;
+	}
+}
+```
+
+以上参数个数不同，多次书写代码不简洁，优化如下：
+
+```java
+class Tools{
+    public int sum(int... nums){
+    	int res = 0;
+    	for(int i = 0;i < nums.length;i++){
+    		res += nums[i];
+    	}
+        return res;
+	}
+}
+```
+
+`int... ` 表示接受的的是可变参数，可以接受多个或者为0，类型为 `int`
+
+- 可以把`nums`看作是数组，采用遍历`nums`来求和，
+
+- 可变参数的实参可以为数组，可变参数本质就是数组。
+- 普通类型的参数可以和可变参数放在一起，可变参数必须放在最后。
+- 一个形参列表中只能出现一个可变参数。
+
+#### 作用域（Scope）：
+
+在面向对象中，变量作用域非常关键：
+
+- 在Java编程中，主要的变量就是属性（成员变量）和局部变量；
+
+- 我们说的局部变量一般是指在成员方法中定义的变量（举例在Cat类中cry）；
+
+- Java中作用域的分类：
+
+  **全局变量**：也就是属性，**作用域作为整个类体**，Cat类：cry eat等方法使用属性
+
+  **局部变量**：也就是除了属性之外的其他变量，作用域是**定义它的代码块中**
+
+- **全局变量可以不赋值**，直接使用，因为有默认值；**局部变量必须赋值后才能使用**，因为没有默认值。
+  
+  ```java
+  class Cat{
+  	int age = 10;//这里整个Cat都可以用age
+      public void cry(){
+      	int n = 10;
+          //这里的n只有cry内部可以使用
+      	String name = "belle";
+  	}
+  	public void eat(){
+  		System.out.println(age);
+  	}
+  }
+  ```
+  
+- **如果全局变量和局部变量重名，就近原则**，使用局部变量，举例如下：
+  
+  ```java
+  class Person{
+  	int age = 10;
+      public void cry(){
+      	int age = 15;
+      	System.out.println(age)
+  	}
+  }//输出的结果是15
+  ```
+  
+  全局变量可以被本类使用，也可以被其他类使用（采用对象调用的方式），局部只能在本类使用举例如下：
+  
+  ```java
+  class Tools{
+  	public void test{
+  		Person p = new Person();
+       //在该类中创建一个Person类来调用
+  		System.out.println(p1.age);
+  	}
+  }
+  class Person{
+  	int age = 10;
+      public void cry(){
+      	int age = 15;
+      	System.out.println(age)
+  	}
+  }
+  ```
+  
+- 全局变量/属性可以加修饰符，局部变量不能加修饰符。
+
+

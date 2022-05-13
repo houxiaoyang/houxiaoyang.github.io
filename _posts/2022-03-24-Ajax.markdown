@@ -1,0 +1,77 @@
+---
+layout: post
+title:  " Ajax "
+subtitle: 
+cover-img: 
+thumbnail-img:
+share-img: 
+date: 2022-03-24 22:10:26 +0800
+tags: [Java, Ajax]
+---
+
+**AJAX：Asynchronous JavaScript and XML （异步的JavaScript和XML）**
+
+- 传统的网页（不使用Ajax）想要更新内容或者提交一个表单，都需要重新加载整个网页
+- 使用Ajax技术的网页，通过在后台服务器进行少量的数据交换，就可以实现异步局部更新
+
+使用Ajax用户可以创建接近本地桌面应用的直接、高可用、更丰富、更动态的web用户界面。
+
+
+
+#### **Ajax可以实现：**
+
+- 注册时，输入用户名自动检测用户是否已经存在
+- 登录时，提示用户名密码错误
+- 删除数据行时，将**行ID**发送到后台，后台在数据中删除，数据库删除成功后，在页面DOM中将数据行也删除
+
+
+
+使用JQuery需要导入Jquery的js包：
+
+Jquery Ajax本质就是XMLHttpRequest，对他进行封装，方便调用，
+
+```jsp
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>Title</title>
+    <script src="${pageContext.request.contextPath}/statics/jquery-3.6.0.js">      
+    </script>
+</head>
+<body>
+<script type="text/javascript">    
+    function a1() {
+        /**
+         * url:待载入页面的URL地址，Json
+         * data:待发送 Key:value 参数
+         * success：载入成功时回调函数
+         * 1.data：封装了服务器返回的数据
+         * 2.status:状态
+         */
+        $.ajax({// 默认时get请求
+            url:"${pageContext.request.contextPath}/ajax/a1",
+            data:{"name":$("txtName").val()},
+            success:function (data,status) {
+                console.log(data)
+                console.log(status)
+            }
+        });
+    }
+</script>
+用户名：
+<input type="text" id="txtName" onblur="a1()">
+</body>
+</html>
+```
+
+## Ajax总结：
+
+1. 编写 对应的Controller，返回消息或者字符串或者json格式的数据
+2. 编写Ajax请求
+   1. url：Controller请求
+   2. data：键值对
+   3. success：回调函数
+3. 给Ajax绑定事件，点击**click**，失去焦点**onblur**，键盘弹起**keyup**
+
+
+

@@ -1,0 +1,130 @@
+---
+layout: post
+title:  " 构造器练习题下 "
+subtitle: 
+cover-img: 
+thumbnail-img:
+share-img: 
+date: 2021-12-18 23:29:26 +0800
+tags: [Java, 练习题]
+---
+
+#### 本章练习题下（Exercise）：
+
+##### Exercise 9：定义Music类，历遍有音乐名name，音乐时长times属性，并有播放play功能和返回本身属性信息的功能方法getInfo.
+
+```java
+public class exercise{
+	public static void main(String[] args){
+		Music test = new Music("belle",300);
+		System.out.println(test.getinfo());
+		test.play();
+	}
+}
+class Music{
+	String name;
+	int times;
+	public Music(String name,int times){
+		this.name = name;
+		this.times =times;
+	}
+	public void play(){
+		System.out.println("Music "+name+"played  times is "+times+" s ");
+	}
+	public String getinfo(){
+		return " Music "+name+" times is "+times;		
+	}
+}
+```
+
+
+
+##### Exercise 11：在测试方法中，调用method方法，代码如下，编译正确，试写出method方法的定义形式，调用语句为：`System.out.println(method(method(10.0,20.0),100));`
+
+```java
+public double method(double n1,double n2){..}
+```
+
+
+
+##### Exercise 12：创建一个Employee类，属性有（名字，性别，年龄，职位，薪水），提供三个构造方法，可以初始化(1)（名字，性别，年龄，职位，薪水），(2)（名字，性别，年龄），(3)（职位，薪水），要求充分复用构造器
+
+```java
+public class exercise{
+	public static void main(String[] args){
+		Employee test = new Employee();
+		new array[] = {"belle","women",26};
+		System.out.println(test.Employee(array));
+	}
+} 
+class Employee{
+	String name;
+	char gender;
+	int age;
+	String job;
+	double sal;
+	public Employee(String job,int sal){
+		this.job = job;
+		this.sal = sal;
+	}
+	public Employee(String name,char gender,int age){
+		this.name = name;
+		this.gender = gender;
+		this.age = age;
+	}
+	public Employee(String name,char gender,int age,String job,double sal){
+		this(name,gender,age);
+		this.job = job;
+		this.sal = sal;
+	}
+}
+```
+
+`this(name,gender,age);` 在这之后可以直接调用前边的构造器`this(job,sal)` 吗？**不可以！！**
+
+**this如果调用，必须放在第一个位置，所以后续的不能再使用this**
+
+##### Exercise 13：将对象作为参数传递给方法。
+
+(1) 定义一个Cicle类，包含一个double型的radius属性代表圆的半径，用findArea()的方法返回圆的面积。
+
+(2)定义一个类PassObject，在类中定义一个方法`printAreas()`，该方法定义如下：
+
+`public void printAreas(Cicle c,int times)`
+
+(3)在`printAreas` 方法中打印输出1到times之间的每个整数半径值，以及对应的面积。例如，times=5 时，则输出1，2，3，4，5，以及对应的圆面积。
+
+```java
+public class exercise{
+	public static void main(String[] args){	
+	    Circle c = new Circle();	
+		PassObject test =  new PassObject();
+		test.printAreas(c,5);
+	}
+} 
+class Circle{
+	double radius;
+    public Circle(){
+        
+    }
+	public double findArea(){
+		return Math.PI * radius * radius;
+	}
+	public void setRadius(double radius){
+		this.radius = radius;
+	}
+}
+class PassObject{
+	public void printAreas(Circle c,int times){
+		System.out.println("radius \t area");
+		for(int i = 1;i <= times;i++){
+			c.setRadius(i);
+			System.out.println((double)i+"\t"+c.findArea());
+		}
+	}
+}
+```
+
+`c.setRadius(i);` 这里先添加一个方法可以修改radius，然后我去调用这个方法来动态的修改radius值。
+
+再用这个值来调用`c.findArea()` 求面积。
