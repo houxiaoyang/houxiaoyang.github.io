@@ -1,0 +1,16 @@
+---
+layout: default
+title: 文章分类
+---
+
+<h1 class="page-title">{{ page.title }}</h1>
+<div class="category-container">
+  {% for category in site.categories %}
+  <a href="/category/{{ category | first }}" class="post" >
+    <h2 class="post-title">{{ category | first }}</h2>
+    <div class="size">
+      共{{ category | last | size }}篇文章
+    </div>
+  </a>
+{% endfor %}
+</div>

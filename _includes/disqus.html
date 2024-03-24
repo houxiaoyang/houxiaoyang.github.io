@@ -1,0 +1,47 @@
+
+{% if page.comments != false and site.commtent-plugin == "disqus" %}
+<script>
+    var options = {
+      shortname: 'soft-breeze',
+      apikey: 'CY5DsSfVmmPqkPfcmlRvFLzvaAmQqEm9NQhP38qZ9oFDYhQ5heq1kCuPLbXBTSli', 
+      url: document.location.origin + document.location.pathname
+    };
+    
+    window.loadDisqus = function () {
+      const disqusjs = new DisqusJS(options);
+      document.getElementById('load_disqus_js').classList.add('done');
+      disqusjs.render(document.getElementById('disqusjs'));
+  };    
+</script>
+<div id="load_disqus_js"><a target="_self" href="javascript:void(0)" onclick="loadDisqus()">点击加载评论</a></div>
+<div id="disqusjs"></div>
+{% endif %}
+
+{% if page.comments != false and site.commtent-plugin == "github" %}
+<div id="load_disqus_js"><a target="_self" href="javascript:void(0)" onclick="loadComments()">点击加载评论</a></div>
+<div class="giscus-container"></div>
+<script>
+  function loadComments() {
+      var giscus_container = document.querySelector(".giscus-container");
+      var script = document.createElement("script");
+      script.src = "https://giscus.app/client.js";
+      script.setAttribute("data-repo", "chengirii/chengirii.github.io");
+      script.setAttribute("data-repo-id", "R_kgDOJppc9A");
+      script.setAttribute("data-category", "General");
+      script.setAttribute("data-category-id", "DIC_kwDOJppc9M4CW239");
+      script.setAttribute("data-mapping", "pathname");
+      script.setAttribute("data-strict", "0");
+      script.setAttribute("data-reactions-enabled", "1");
+      script.setAttribute("data-emit-metadata", "0");
+      script.setAttribute("data-input-position", "bottom");
+      script.setAttribute("data-theme", "https://gw.alipayobjects.com/os/k/9z78d6/comment.css");
+      script.setAttribute("data-lang", "zh-CN");
+      script.setAttribute("data-loading", "lazy");
+      script.setAttribute("crossorigin", "anonymous");
+      script.async = true;
+      giscus_container.appendChild(script);
+      document.getElementById('load_disqus_js').classList.add('done');
+  }
+  </script>
+
+{% endif %}

@@ -1,0 +1,93 @@
+title:            风
+author:           Clyde
+description:      Be yourself and don't go with the flow.
+avatar:           /assets/img/avatar.jpg
+url:              https://houxiaoyang.github.io
+icon:             /assets/img/favicon.ico
+commtent-plugin:  github # github or disqus
+
+typed-js:         false  # 打字机效果
+
+menu:
+  - name:          首页
+    link:          /
+    target:        _self
+
+  - name:          归档
+    link:          /archives/
+    target:        _self
+
+  - name:          分类
+    link:          /category/
+    target:        _self
+
+
+  - name:          关于
+    link:          /about/
+    target:        _self
+
+  - name:          RSS
+    link:          /feed.xml
+    target:        _blank
+
+lang:      zh-cmn-Hans
+timezone: Asia/Shanghai
+locale:      zh_CN
+future:      true
+
+sass:
+  sass_dir: _sass
+  style: compressed
+
+
+paginate: 10
+paginate_path: "page/:num/"
+
+google_analytics:  
+
+google_verify:
+baidu_verify:
+
+collections:
+  tabs:
+    output: true
+
+
+defaults:
+  - scope:
+      path: "" 
+      type: posts
+    values:
+      layout: post
+      comments: true
+      permalink: /posts/:title/
+  
+  - scope:
+      path: ""
+      type: tabs # see `site.collections`
+    values:
+      layout: page
+      permalink: /:title/
+
+
+
+include: [".htaccess"]
+exclude: ["Gemfile", "Gemfile.lock", "README.md", "LICENSE", "package.json","node_modules"]
+
+gems:
+  - jekyll-paginate
+  - jekyll-sitemap
+  - jekyll-feed
+  - jekyll-archives
+
+plugins:
+  - jekyll-paginate
+  - jekyll-archives
+
+
+jekyll-archives:
+  enabled: [categories]
+  layouts:
+    category: categories
+  permalinks:
+    category: /category/:name/

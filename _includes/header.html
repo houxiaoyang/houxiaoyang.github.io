@@ -1,0 +1,20 @@
+<div class="site-header">
+    <img class="avatar" src="{{site.avatar}}" alt="">
+    <h1 class="site-title" >
+        <a href="/">{{site.title}}</a>
+    </h1>
+    <p class="site-description">
+        {% if site.typed-js %}
+        <span id="typed"></span>
+        {% else %}
+        {{site.description}}
+        {% endif %}
+    </p>
+    <div class="menu-container">
+        {% for menu in site.menu  %}
+        <a href="{{menu.link}}" target="{{menu.target}}" class="menu" >
+            {{menu.name}}
+        </a>
+        {% endfor %}
+    </div>
+</div>
